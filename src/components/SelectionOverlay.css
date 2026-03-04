@@ -1,0 +1,155 @@
+/**
+ * SelectionOverlay Component Styles
+ * 
+ * Premium selection effects with glowing borders and animated handles.
+ * 
+ * Requirements: 3.2, 3.3, 9.5
+ */
+
+.selection-overlay {
+  z-index: 1000;
+}
+
+/* Border highlight around selected element */
+.selection-border {
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  border: 3px solid transparent;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)) border-box;
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) padding-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  box-sizing: border-box;
+  border-radius: var(--radius-md);
+  animation: selectionPulse 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 0 20px rgba(99, 102, 241, 0.5),
+    inset 0 0 20px rgba(99, 102, 241, 0.2);
+}
+
+@keyframes selectionPulse {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+    box-shadow: 0 0 0 rgba(99, 102, 241, 0);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(99, 102, 241, 0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+  }
+}
+
+/* Base styles for all resize handles */
+.resize-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-sizing: border-box;
+  border-radius: 3px;
+  transition: all var(--transition-fast);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.4),
+    0 0 12px rgba(99, 102, 241, 0.6);
+  animation: handlePop 0.3s var(--transition-bounce);
+}
+
+@keyframes handlePop {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  70% {
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Corner handles */
+.resize-handle-nw {
+  top: -4px;
+  left: -4px;
+  cursor: nw-resize;
+}
+
+.resize-handle-ne {
+  top: -4px;
+  right: -4px;
+  cursor: ne-resize;
+}
+
+.resize-handle-se {
+  bottom: -4px;
+  right: -4px;
+  cursor: se-resize;
+}
+
+.resize-handle-sw {
+  bottom: -4px;
+  left: -4px;
+  cursor: sw-resize;
+}
+
+/* Edge handles */
+.resize-handle-n {
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: n-resize;
+}
+
+.resize-handle-e {
+  top: 50%;
+  right: -4px;
+  transform: translateY(-50%);
+  cursor: e-resize;
+}
+
+.resize-handle-s {
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: s-resize;
+}
+
+.resize-handle-w {
+  top: 50%;
+  left: -4px;
+  transform: translateY(-50%);
+  cursor: w-resize;
+}
+
+/* Hover effect for handles */
+.resize-handle:hover {
+  background: linear-gradient(135deg, var(--color-primary-light), var(--color-accent));
+  transform: scale(1.4) rotate(45deg);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(99, 102, 241, 0.8);
+  border-color: rgba(255, 255, 255, 1);
+}
+
+/* Maintain transform for edge handles on hover */
+.resize-handle-n:hover,
+.resize-handle-s:hover {
+  transform: translateX(-50%) scale(1.4) rotate(45deg);
+}
+
+.resize-handle-e:hover,
+.resize-handle-w:hover {
+  transform: translateY(-50%) scale(1.4) rotate(45deg);
+}

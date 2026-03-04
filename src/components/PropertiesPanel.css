@@ -1,0 +1,179 @@
+/**
+ * PropertiesPanel Component Styles
+ * 
+ * Premium glassmorphism panel with smooth animations and gradient accents.
+ * 
+ * Requirements: 14.1, 14.6, 14.7, 9.4
+ */
+
+.properties-panel {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xl);
+  background: var(--color-surface);
+  backdrop-filter: blur(20px);
+  min-width: 280px;
+  box-shadow: 
+    var(--shadow-lg),
+    inset 0 1px 0 0 rgba(148, 163, 184, 0.1);
+  animation: slideInRight 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.properties-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary), var(--color-accent));
+  background-size: 200% 100%;
+  animation: gradientSlide 3s ease infinite;
+}
+
+@keyframes gradientSlide {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.properties-panel h3 {
+  margin: 0 0 var(--spacing-xl) 0;
+  font-size: 18px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--color-primary-light), var(--color-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  position: relative;
+  padding-bottom: var(--spacing-sm);
+}
+
+.properties-panel h3::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-primary), transparent);
+  border-radius: var(--radius-full);
+}
+
+.properties-panel .no-selection {
+  color: var(--color-text-secondary);
+  font-style: italic;
+  margin: 0;
+  font-size: 14px;
+}
+
+.property-group {
+  margin-bottom: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+}
+
+.property-group:last-child {
+  margin-bottom: 0;
+}
+
+.property-group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 12px;
+}
+
+.property-group input {
+  padding: var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
+  backdrop-filter: blur(10px);
+  color: var(--color-text-primary);
+  transition: all var(--transition-base);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.property-group input:hover {
+  border-color: var(--color-primary-light);
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%);
+}
+
+.property-group input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 
+    0 0 0 3px var(--color-primary-glow),
+    inset 0 2px 4px rgba(0, 0, 0, 0.2),
+    0 0 20px rgba(99, 102, 241, 0.2);
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 1) 100%);
+  transform: translateY(-1px);
+}
+
+.property-group input.error {
+  border-color: var(--color-error);
+  background: var(--color-error-bg);
+  animation: inputShake 0.3s ease-in-out;
+}
+
+@keyframes inputShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.property-group input.error:focus {
+  box-shadow: 
+    0 0 0 3px rgba(244, 63, 94, 0.3),
+    inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.error-message {
+  color: var(--color-error);
+  font-size: 12px;
+  margin-top: var(--spacing-xs);
+  font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .properties-panel {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .properties-panel {
+    padding: var(--spacing-md);
+    min-width: auto;
+  }
+  
+  .properties-panel h3 {
+    font-size: 14px;
+  }
+  
+  .property-group input {
+    font-size: 13px;
+  }
+}
