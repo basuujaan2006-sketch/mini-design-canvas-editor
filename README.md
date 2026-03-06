@@ -102,7 +102,6 @@ npm test
 ## License
 
 MIT
-
 =======
 # mini-design-canvas-editor
 >>>>>>> 2c24f1a74b1755f33559b09029cca043407cb7ea
