@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Mini Design Canvas Editor
 
 A lightweight, interactive design canvas application built with React, TypeScript, and Vite. Create, manipulate, and export visual designs with rectangles, text blocks, and image placeholders.
@@ -105,3 +106,6 @@ MIT
 ## Contributing
 
 This project was built following a specification-driven development approach with comprehensive property-based testing. See the `.kiro/specs/design-canvas-editor/` directory for detailed requirements, design, and implementation tasks.
+=======
+# mini-design-canvas-editor
+>>>>>>> 2c24f1a74b1755f33559b09029cca043407cb7ea
