@@ -103,9 +103,6 @@ npm test
 
 MIT
 
-## Contributing
-
-This project was built following a specification-driven development approach with comprehensive property-based testing. See the `.kiro/specs/design-canvas-editor/` directory for detailed requirements, design, and implementation tasks.
 =======
 # mini-design-canvas-editor
 >>>>>>> 2c24f1a74b1755f33559b09029cca043407cb7ea
