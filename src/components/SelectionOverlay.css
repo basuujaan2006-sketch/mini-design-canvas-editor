@@ -8,6 +8,7 @@
 
 .selection-overlay {
   z-index: 1000;
+  will-change: transform;
 }
 
 /* Border highlight around selected element */
@@ -17,36 +18,11 @@
   left: -3px;
   right: -3px;
   bottom: -3px;
-  border: 3px solid transparent;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)) border-box;
-  -webkit-mask: 
-    linear-gradient(#fff 0 0) padding-box, 
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
+  border: 3px solid var(--color-primary);
   pointer-events: none;
   box-sizing: border-box;
   border-radius: var(--radius-md);
-  animation: selectionPulse 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 
-    0 0 20px rgba(99, 102, 241, 0.5),
-    inset 0 0 20px rgba(99, 102, 241, 0.2);
-}
-
-@keyframes selectionPulse {
-  0% {
-    opacity: 0;
-    transform: scale(0.9);
-    box-shadow: 0 0 0 rgba(99, 102, 241, 0);
-  }
-  50% {
-    box-shadow: 0 0 40px rgba(99, 102, 241, 0.8);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
-  }
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
 }
 
 /* Base styles for all resize handles */
@@ -54,29 +30,12 @@
   position: absolute;
   width: 12px;
   height: 12px;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  background: var(--color-primary);
   border: 2px solid rgba(255, 255, 255, 0.9);
   box-sizing: border-box;
   border-radius: 3px;
-  transition: all var(--transition-fast);
-  box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.4),
-    0 0 12px rgba(99, 102, 241, 0.6);
-  animation: handlePop 0.3s var(--transition-bounce);
-}
-
-@keyframes handlePop {
-  0% {
-    opacity: 0;
-    transform: scale(0);
-  }
-  70% {
-    transform: scale(1.2);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
+  transition: transform 0.1s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
 /* Corner handles */
@@ -135,21 +94,67 @@
 
 /* Hover effect for handles */
 .resize-handle:hover {
-  background: linear-gradient(135deg, var(--color-primary-light), var(--color-accent));
-  transform: scale(1.4) rotate(45deg);
-  box-shadow: 
-    0 4px 12px rgba(0, 0, 0, 0.5),
-    0 0 20px rgba(99, 102, 241, 0.8);
-  border-color: rgba(255, 255, 255, 1);
+  background: var(--color-primary-light);
+  transform: scale(1.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 /* Maintain transform for edge handles on hover */
 .resize-handle-n:hover,
 .resize-handle-s:hover {
-  transform: translateX(-50%) scale(1.4) rotate(45deg);
+  transform: translateX(-50%) scale(1.3);
 }
 
 .resize-handle-e:hover,
 .resize-handle-w:hover {
-  transform: translateY(-50%) scale(1.4) rotate(45deg);
+  transform: translateY(-50%) scale(1.3);
+}
+
+/* Rotation handle */
+.rotation-handle {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 28px;
+  background: var(--color-accent);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.rotation-handle::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 12px;
+  background: linear-gradient(180deg, var(--color-accent), transparent);
+}
+
+.rotation-handle-icon {
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  user-select: none;
+}
+
+.rotation-handle:hover {
+  transform: translateX(-50%) scale(1.2);
+  background: var(--color-accent-hover);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  cursor: grabbing;
+}
+
+.rotation-handle:active {
+  transform: translateX(-50%) scale(1.1);
+  cursor: grabbing;
 }

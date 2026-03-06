@@ -177,3 +177,70 @@
     font-size: 13px;
   }
 }
+
+/* Rotation slider */
+.rotation-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary), var(--color-accent));
+  outline: none;
+  padding: 0;
+  margin: var(--spacing-sm) 0;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.rotation-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 12px rgba(99, 102, 241, 0.6);
+  transition: all var(--transition-fast);
+}
+
+.rotation-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 20px rgba(99, 102, 241, 0.8);
+}
+
+.rotation-slider::-webkit-slider-thumb:active {
+  transform: scale(1.1);
+}
+
+.rotation-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 12px rgba(99, 102, 241, 0.6);
+  transition: all var(--transition-fast);
+}
+
+.rotation-slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 20px rgba(99, 102, 241, 0.8);
+}
+
+.rotation-slider::-moz-range-thumb:active {
+  transform: scale(1.1);
+}
+
+.rotation-value {
+  display: inline-block;
+  margin-left: var(--spacing-sm);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-primary-light);
+  font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
+  min-width: 40px;
+  text-align: right;
+}

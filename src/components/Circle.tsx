@@ -1,21 +1,19 @@
 /**
- * Rectangle Component
+ * Circle Component
  * 
- * Renders a colored rectangle element with configurable background color.
- * 
- * Requirements: 2.1
+ * Renders a circular/elliptical element with configurable color and opacity.
  */
 
 import type { Element } from '../types/canvas';
 
-export interface RectangleProps {
+export interface CircleProps {
   element: Element;
   isSelected: boolean;
   onSelect: () => void;
   onMouseDown?: (e: React.MouseEvent | React.TouchEvent) => void;
 }
 
-export function Rectangle({ element, isSelected, onSelect, onMouseDown }: RectangleProps) {
+export function Circle({ element, isSelected, onSelect, onMouseDown }: CircleProps) {
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onSelect();
@@ -27,23 +25,23 @@ export function Rectangle({ element, isSelected, onSelect, onMouseDown }: Rectan
     }
   };
 
-  const rotation = element.rotation || 0;
-
   return (
     <div
       data-testid={`element-${element.id}`}
-      className={`canvas-element canvas-rectangle ${isSelected ? 'selected' : ''}`}
+      className={`canvas-element canvas-circle ${isSelected ? 'selected' : ''}`}
       style={{
         position: 'absolute',
         left: `${element.position.x}px`,
         top: `${element.position.y}px`,
         width: `${element.dimensions.width}px`,
         height: `${element.dimensions.height}px`,
-        backgroundColor: element.color || '#3b82f6',
+        backgroundColor: element.color || '#ec4899',
         cursor: 'pointer',
         boxSizing: 'border-box',
-        transform: `rotate(${rotation}deg)`,
-        transformOrigin: 'center center',
+        borderRadius: '50%',
+        opacity: element.opacity ?? 1,
+        transform: `rotate(${element.rotation || 0}deg)`,
+        pointerEvents: element.locked ? 'none' : 'auto',
       }}
       onClick={handleClick}
       onMouseDown={handleMouseDown}

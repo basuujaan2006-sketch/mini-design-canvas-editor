@@ -47,7 +47,7 @@ export async function exportCanvasAsPNG(
 
   // Render each element
   for (const element of sortedElements) {
-    renderElement(ctx, element);
+    await renderElement(ctx, element);
   }
 
   // Convert canvas to blob
@@ -78,7 +78,7 @@ export async function exportCanvasAsPNG(
  * @param ctx - Canvas 2D rendering context
  * @param element - Element to render
  */
-function renderElement(ctx: CanvasRenderingContext2D, element: Element): void {
+async function renderElement(ctx: CanvasRenderingContext2D, element: Element): Promise<void> {
   switch (element.type) {
     case 'rectangle':
       renderRectangle(ctx, element);
@@ -87,7 +87,7 @@ function renderElement(ctx: CanvasRenderingContext2D, element: Element): void {
       renderTextBlock(ctx, element);
       break;
     case 'image':
-      renderImagePlaceholder(ctx, element);
+      await renderImagePlaceholder(ctx, element);
       break;
   }
 }
@@ -162,11 +162,36 @@ function renderTextBlock(ctx: CanvasRenderingContext2D, element: Element): void 
 }
 
 /**
- * Renders an image placeholder element
+ * Renders an image placeholder element or actual image
  */
-function renderImagePlaceholder(ctx: CanvasRenderingContext2D, element: Element): void {
-  const { position, dimensions } = element;
+async function renderImagePlaceholder(ctx: CanvasRenderingContext2D, element: Element): Promise<void> {
+  const { position, dimensions, imageUrl } = element;
   
+  if (imageUrl) {
+    // Render actual image
+    try {
+      const img = new Image();
+      img.src = imageUrl;
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+      ctx.drawImage(img, position.x, position.y, dimensions.width, dimensions.height);
+    } catch (error) {
+      // Fall back to placeholder if image fails to load
+      renderPlaceholder(ctx, position, dimensions);
+    }
+  } else {
+    // Render placeholder
+    renderPlaceholder(ctx, position, dimensions);
+  }
+}
+
+function renderPlaceholder(
+  ctx: CanvasRenderingContext2D,
+  position: { x: number; y: number },
+  dimensions: { width: number; height: number }
+): void {
   // Background
   ctx.fillStyle = '#f3f4f6';
   ctx.fillRect(position.x, position.y, dimensions.width, dimensions.height);
@@ -187,5 +212,5 @@ function renderImagePlaceholder(ctx: CanvasRenderingContext2D, element: Element)
   
   ctx.fillText('🖼', centerX, centerY - 15);
   ctx.font = '14px sans-serif';
-  ctx.fillText('Image Placeholder', centerX, centerY + 15);
+  ctx.fillText('Image', centerX, centerY + 15);
 }

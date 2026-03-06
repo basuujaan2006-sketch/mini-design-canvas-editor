@@ -19,9 +19,11 @@ import type { Element, CanvasConfig, DragState, Position, AlignmentGuide } from 
 import { Rectangle } from './Rectangle';
 import { TextBlock } from './TextBlock';
 import { ImagePlaceholder } from './ImagePlaceholder';
+import { Circle } from './Circle';
+import { Line } from './Line';
 import { SelectionOverlay } from './SelectionOverlay';
 import { AlignmentGuides } from './AlignmentGuides';
-import { handleDragStart, handleDragMove, handleDragEnd } from '../utils/dragHandler';
+import { handleDragStart, handleDragMove } from '../utils/dragHandler';
 import { detectAlignments } from '../utils/alignmentGuides';
 import './Canvas.css';
 
@@ -50,26 +52,32 @@ export function Canvas({
   const [dragState, setDragState] = useState<DragState | null>(null);
   // State for tracking alignment guides
   const [alignmentGuides, setAlignmentGuides] = useState<AlignmentGuide[]>([]);
+  // Track if user has actually moved the mouse (not just clicked)
+  const [hasMoved, setHasMoved] = useState(false);
   const canvasRef = useRef<HTMLDivElement>(null);
+  const dragThreshold = 3; // pixels to move before considering it a drag
 
   /**
-   * Get mouse position relative to canvas
+   * Get mouse/touch position relative to canvas
    */
-  const getMousePosition = (e: MouseEvent): Position => {
+  const getMousePosition = (e: MouseEvent | TouchEvent): Position => {
     if (!canvasRef.current) return { x: 0, y: 0 };
     
     const rect = canvasRef.current.getBoundingClientRect();
+    const clientX = 'touches' in e ? (e.touches[0]?.clientX ?? 0) : e.clientX;
+    const clientY = 'touches' in e ? (e.touches[0]?.clientY ?? 0) : e.clientY;
+    
     return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x: clientX - rect.left,
+      y: clientY - rect.top,
     };
   };
 
   /**
-   * Handle mouse down on an element to start dragging
+   * Handle mouse/touch down on an element to start dragging
    * Requirements: 4.1
    */
-  const handleMouseDown = (e: React.MouseEvent, element: Element) => {
+  const handleMouseDown = (e: React.MouseEvent | React.TouchEvent, element: Element) => {
     // Prevent default to avoid text selection during drag
     e.preventDefault();
     e.stopPropagation();
@@ -77,24 +85,46 @@ export function Canvas({
     // Select the element
     onElementSelect(element.id);
 
-    // Start drag operation
-    const mousePosition = getMousePosition(e.nativeEvent);
+    // Prepare drag state but don't start dragging yet
+    const nativeEvent = e.nativeEvent as MouseEvent | TouchEvent;
+    const mousePosition = getMousePosition(nativeEvent);
     const newDragState = handleDragStart(element.id, element, mousePosition);
-    setDragState(newDragState);
+    // Set isDragging to false initially - will be set to true when mouse moves
+    setDragState({ ...newDragState, isDragging: false });
+    setHasMoved(false);
   };
 
   /**
-   * Handle mouse move to update element position during drag
+   * Handle mouse/touch move to update element position during drag
    * Requirements: 4.1, 4.5, 12.1
    */
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!dragState || !dragState.isDragging) return;
+    const handleMouseMove = (e: MouseEvent | TouchEvent) => {
+      if (!dragState) return;
 
       const element = elements.find((el) => el.id === dragState.elementId);
       if (!element) return;
 
       const mousePosition = getMousePosition(e);
+      
+      // Check if mouse has moved beyond threshold
+      if (!hasMoved && !dragState.isDragging) {
+        const dx = Math.abs(mousePosition.x - (dragState.startPosition.x + dragState.offset.x));
+        const dy = Math.abs(mousePosition.y - (dragState.startPosition.y + dragState.offset.y));
+        
+        if (dx > dragThreshold || dy > dragThreshold) {
+          // Start actual dragging
+          setHasMoved(true);
+          setDragState({ ...dragState, isDragging: true });
+        } else {
+          // Haven't moved enough yet, don't update position
+          return;
+        }
+      }
+
+      // Only update position if actually dragging
+      if (!dragState.isDragging && !hasMoved) return;
+
       const newPosition = handleDragMove(
         dragState,
         mousePosition,
@@ -106,7 +136,6 @@ export function Canvas({
       onElementUpdate(element.id, { position: newPosition });
 
       // Detect alignments with other elements
-      // Create a temporary element with the new position for alignment detection
       const movingElement: Element = {
         ...element,
         position: newPosition,
@@ -117,29 +146,32 @@ export function Canvas({
     };
 
     const handleMouseUp = () => {
-      if (!dragState || !dragState.isDragging) return;
+      if (!dragState) return;
 
       // End drag operation
-      const finalDragState = handleDragEnd(dragState);
-      setDragState(finalDragState);
+      setDragState(null);
+      setHasMoved(false);
 
       // Clear alignment guides when drag ends
-      // Requirements: 12.4
       setAlignmentGuides([]);
     };
 
-    // Add global event listeners for mouse move and up
-    if (dragState?.isDragging) {
+    // Add global event listeners for mouse/touch move and up
+    if (dragState) {
       window.addEventListener('mousemove', handleMouseMove);
       window.addEventListener('mouseup', handleMouseUp);
+      window.addEventListener('touchmove', handleMouseMove);
+      window.addEventListener('touchend', handleMouseUp);
     }
 
     // Cleanup
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('touchmove', handleMouseMove);
+      window.removeEventListener('touchend', handleMouseUp);
     };
-  }, [dragState, elements, config, onElementUpdate]);
+  }, [dragState, elements, config, onElementUpdate, hasMoved, dragThreshold]);
 
   /**
    * Handle keyboard events for Delete key and Ctrl+D / Cmd+D
@@ -207,6 +239,13 @@ export function Canvas({
     onElementUpdate(elementId, { imageUrl });
   };
 
+  /**
+   * Handle text change for text elements
+   */
+  const handleTextChange = (elementId: string, text: string) => {
+    onElementUpdate(elementId, { text });
+  };
+
   return (
     <div
       ref={canvasRef}
@@ -215,6 +254,7 @@ export function Canvas({
         width: `${config.width}px`,
         height: `${config.height}px`,
         cursor: dragState?.isDragging ? 'grabbing' : 'default',
+        touchAction: 'none', // Prevent default touch behaviors
       }}
       onClick={handleCanvasClick}
     >
@@ -226,6 +266,7 @@ export function Canvas({
           onSelect={() => onElementSelect(element.id)}
           onMouseDown={(e) => handleMouseDown(e, element)}
           onImageUpload={handleImageUpload}
+          onTextChange={handleTextChange}
         />
       ))}
       
@@ -262,11 +303,12 @@ interface CanvasElementProps {
   element: Element;
   isSelected: boolean;
   onSelect: () => void;
-  onMouseDown: (e: React.MouseEvent) => void;
+  onMouseDown: (e: React.MouseEvent | React.TouchEvent) => void;
   onImageUpload?: (elementId: string, imageUrl: string) => void;
+  onTextChange?: (elementId: string, text: string) => void;
 }
 
-function CanvasElement({ element, isSelected, onSelect, onMouseDown, onImageUpload }: CanvasElementProps) {
+function CanvasElement({ element, isSelected, onSelect, onMouseDown, onImageUpload, onTextChange }: CanvasElementProps) {
   // Render based on element type
   switch (element.type) {
     case 'rectangle':
@@ -286,6 +328,7 @@ function CanvasElement({ element, isSelected, onSelect, onMouseDown, onImageUplo
           isSelected={isSelected}
           onSelect={onSelect}
           onMouseDown={onMouseDown}
+          onTextChange={onTextChange}
         />
       );
 
@@ -297,6 +340,26 @@ function CanvasElement({ element, isSelected, onSelect, onMouseDown, onImageUplo
           onSelect={onSelect}
           onMouseDown={onMouseDown}
           onImageUpload={onImageUpload}
+        />
+      );
+
+    case 'circle':
+      return (
+        <Circle
+          element={element}
+          isSelected={isSelected}
+          onSelect={onSelect}
+          onMouseDown={onMouseDown}
+        />
+      );
+
+    case 'line':
+      return (
+        <Line
+          element={element}
+          isSelected={isSelected}
+          onSelect={onSelect}
+          onMouseDown={onMouseDown}
         />
       );
 

@@ -138,3 +138,48 @@ export function createImagePlaceholder(
     imageUrl: undefined, // Placeholder has no image initially
   };
 }
+
+/**
+ * Creates a new circle element with default properties.
+ * 
+ * @param existingElements - Array of existing elements (used to determine z-index)
+ * @returns A new circle element
+ */
+export function createCircle(
+  existingElements: Element[]
+): Element {
+  const highestZIndex = getHighestZIndex(existingElements);
+  
+  return {
+    id: crypto.randomUUID(),
+    type: 'circle' as ElementType,
+    position: { ...DEFAULT_POSITION },
+    dimensions: { width: 120, height: 120 },
+    zIndex: highestZIndex + 1,
+    color: '#ec4899', // Pink
+    opacity: 1,
+  };
+}
+
+/**
+ * Creates a new line element with default properties.
+ * 
+ * @param existingElements - Array of existing elements (used to determine z-index)
+ * @returns A new line element
+ */
+export function createLine(
+  existingElements: Element[]
+): Element {
+  const highestZIndex = getHighestZIndex(existingElements);
+  
+  return {
+    id: crypto.randomUUID(),
+    type: 'line' as ElementType,
+    position: { ...DEFAULT_POSITION },
+    dimensions: { width: 200, height: 3 },
+    zIndex: highestZIndex + 1,
+    color: '#14b8a6', // Teal
+    strokeWidth: 3,
+    opacity: 1,
+  };
+}

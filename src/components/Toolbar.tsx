@@ -43,39 +43,67 @@ export function Toolbar({
   return (
     <div className="toolbar">
       <div className="toolbar-section">
+        <h4 className="toolbar-section-title">Shapes</h4>
         <button
           className="toolbar-button"
           onClick={() => onAddElement('rectangle')}
-          title="Add Rectangle"
+          title="Add Rectangle (R)"
         >
-          <span style={{ fontSize: '18px' }}>◼️</span> Rectangle
+          <span className="toolbar-icon">◼️</span>
+          <span className="toolbar-label">Rectangle</span>
         </button>
         <button
           className="toolbar-button"
-          onClick={() => onAddElement('text')}
-          title="Add Text Block"
+          onClick={() => onAddElement('circle')}
+          title="Add Circle (C)"
         >
-          <span style={{ fontSize: '18px' }}>📝</span> Text
+          <span className="toolbar-icon">⭕</span>
+          <span className="toolbar-label">Circle</span>
         </button>
         <button
           className="toolbar-button"
-          onClick={() => onAddElement('image')}
-          title="Add Image Placeholder"
+          onClick={() => onAddElement('line')}
+          title="Add Line (L)"
         >
-          <span style={{ fontSize: '18px' }}>🖼️</span> Image
+          <span className="toolbar-icon">➖</span>
+          <span className="toolbar-label">Line</span>
         </button>
       </div>
 
       <div className="toolbar-divider" />
 
       <div className="toolbar-section">
+        <h4 className="toolbar-section-title">Content</h4>
+        <button
+          className="toolbar-button"
+          onClick={() => onAddElement('text')}
+          title="Add Text (T)"
+        >
+          <span className="toolbar-icon">📝</span>
+          <span className="toolbar-label">Text</span>
+        </button>
+        <button
+          className="toolbar-button"
+          onClick={() => onAddElement('image')}
+          title="Add Image (I)"
+        >
+          <span className="toolbar-icon">🖼️</span>
+          <span className="toolbar-label">Image</span>
+        </button>
+      </div>
+
+      <div className="toolbar-divider" />
+
+      <div className="toolbar-section">
+        <h4 className="toolbar-section-title">History</h4>
         <button
           className="toolbar-button"
           onClick={onUndo}
           disabled={!canUndo}
           title="Undo (Ctrl+Z)"
         >
-          <span style={{ fontSize: '18px' }}>↶</span> Undo
+          <span className="toolbar-icon">↶</span>
+          <span className="toolbar-label">Undo</span>
         </button>
         <button
           className="toolbar-button"
@@ -83,7 +111,8 @@ export function Toolbar({
           disabled={!canRedo}
           title="Redo (Ctrl+Shift+Z)"
         >
-          <span style={{ fontSize: '18px' }}>↷</span> Redo
+          <span className="toolbar-icon">↷</span>
+          <span className="toolbar-label">Redo</span>
         </button>
       </div>
 
@@ -95,7 +124,8 @@ export function Toolbar({
           onClick={onExport}
           title="Export Canvas as PNG"
         >
-          <span style={{ fontSize: '18px' }}>💾</span> Export PNG
+          <span className="toolbar-icon">💾</span>
+          <span className="toolbar-label">Export PNG</span>
         </button>
       </div>
     </div>

@@ -5,8 +5,8 @@
  * including element types, state structures, and action types for the reducer.
  */
 
-// Element type enumeration
-export type ElementType = 'rectangle' | 'text' | 'image';
+// Element type enumeration - ENHANCED with new shapes
+export type ElementType = 'rectangle' | 'text' | 'image' | 'circle' | 'line';
 
 // Position interface for x, y coordinates
 export interface Position {
@@ -28,9 +28,17 @@ export interface Element {
   dimensions: Dimensions;
   zIndex: number;
   // Type-specific optional properties
-  color?: string;      // for rectangles
+  color?: string;      // for rectangles, circles, lines
   text?: string;       // for text blocks
   imageUrl?: string;   // for image placeholders
+  // ADVANCED FEATURES
+  opacity?: number;    // 0-1 for transparency
+  rotation?: number;   // degrees for rotation
+  locked?: boolean;    // prevent editing
+  strokeWidth?: number; // for lines and borders
+  fontSize?: number;   // for text
+  fontFamily?: string; // for text
+  borderRadius?: number; // for rounded rectangles
 }
 
 // Canvas configuration interface
@@ -40,6 +48,8 @@ export interface CanvasConfig {
   gridSize: number;
   minElementWidth: number;
   minElementHeight: number;
+  zoom?: number; // zoom level (1 = 100%)
+  showGrid?: boolean; // toggle grid visibility
 }
 
 // Canvas state interface - the single source of truth
@@ -47,6 +57,8 @@ export interface CanvasState {
   elements: Element[];
   selectedId: string | null;
   gridSize: number;
+  zoom: number;
+  showGrid: boolean;
 }
 
 // Action types for the state reducer
@@ -57,7 +69,11 @@ export type CanvasAction =
   | { type: 'SELECT_ELEMENT'; id: string | null }
   | { type: 'UNDO' }
   | { type: 'REDO' }
-  | { type: 'DUPLICATE_ELEMENT'; id: string };
+  | { type: 'DUPLICATE_ELEMENT'; id: string }
+  | { type: 'SET_ZOOM'; zoom: number }
+  | { type: 'TOGGLE_GRID' }
+  | { type: 'BRING_TO_FRONT'; id: string }
+  | { type: 'SEND_TO_BACK'; id: string };
 
 // Resize handle type for corner and edge handles
 export type ResizeHandle = 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w';

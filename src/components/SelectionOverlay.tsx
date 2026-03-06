@@ -27,22 +27,28 @@ export interface SelectionOverlayProps {
 const RESIZE_HANDLES: ResizeHandle[] = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
 
 export function SelectionOverlay({ element, config, onElementUpdate }: SelectionOverlayProps) {
-  const { position, dimensions } = element;
+  const { position, dimensions, rotation = 0 } = element;
   const [resizeState, setResizeState] = useState<ResizeState | null>(null);
+  const [isRotating, setIsRotating] = useState(false);
+  const [rotationStart, setRotationStart] = useState({ angle: 0, mouseAngle: 0 });
 
   /**
-   * Handle mouse down on a resize handle to start resizing
+   * Handle mouse/touch down on a resize handle to start resizing
    * Requirements: 5.1
    */
-  const handleMouseDown = (e: React.MouseEvent, handle: ResizeHandle) => {
+  const handleMouseDown = (e: React.MouseEvent | React.TouchEvent, handle: ResizeHandle) => {
     // Prevent default to avoid text selection during resize
     e.preventDefault();
     e.stopPropagation();
 
-    // Get mouse position relative to the page
+    // Get mouse/touch position relative to the page
+    const nativeEvent = e.nativeEvent as MouseEvent | TouchEvent;
+    const clientX = 'touches' in nativeEvent ? (nativeEvent.touches[0]?.clientX ?? 0) : nativeEvent.clientX;
+    const clientY = 'touches' in nativeEvent ? (nativeEvent.touches[0]?.clientY ?? 0) : nativeEvent.clientY;
+    
     const mousePosition: Position = {
-      x: e.clientX,
-      y: e.clientY,
+      x: clientX ?? 0,
+      y: clientY ?? 0,
     };
 
     // Start resize operation
@@ -51,52 +57,126 @@ export function SelectionOverlay({ element, config, onElementUpdate }: Selection
   };
 
   /**
-   * Handle mouse move to update element dimensions during resize
+   * Handle rotation handle mouse down
+   */
+  const handleRotationMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const nativeEvent = e.nativeEvent as MouseEvent | TouchEvent;
+    const clientX = 'touches' in nativeEvent ? (nativeEvent.touches[0]?.clientX ?? 0) : nativeEvent.clientX;
+    const clientY = 'touches' in nativeEvent ? (nativeEvent.touches[0]?.clientY ?? 0) : nativeEvent.clientY;
+
+    // Calculate center of element
+    const centerX = position.x + dimensions.width / 2;
+    const centerY = position.y + dimensions.height / 2;
+
+    // Calculate initial angle
+    const mouseAngle = Math.atan2(clientY - centerY, clientX - centerX) * (180 / Math.PI);
+
+    setIsRotating(true);
+    setRotationStart({ angle: rotation, mouseAngle });
+  };
+
+  /**
+   * Handle mouse/touch move to update element dimensions during resize
    * Requirements: 5.1
    */
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!resizeState || !resizeState.isResizing) return;
+    let rafId: number | null = null;
 
-      const mousePosition: Position = {
-        x: e.clientX,
-        y: e.clientY,
-      };
+    const handleMouseMove = (e: MouseEvent | TouchEvent) => {
+      // Cancel any pending animation frame
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+      }
 
-      const { dimensions: newDimensions, position: newPosition } = handleResizeMove(
-        resizeState,
-        mousePosition,
-        element,
-        config
-      );
+      // Use requestAnimationFrame for smooth updates
+      rafId = requestAnimationFrame(() => {
+        // Handle resize
+        if (resizeState && resizeState.isResizing) {
+          const clientX = 'touches' in e ? (e.touches[0]?.clientX ?? 0) : e.clientX;
+          const clientY = 'touches' in e ? (e.touches[0]?.clientY ?? 0) : e.clientY;
 
-      // Update element dimensions and position in real-time
-      onElementUpdate(element.id, {
-        dimensions: newDimensions,
-        position: newPosition,
+          const mousePosition: Position = {
+            x: clientX ?? 0,
+            y: clientY ?? 0,
+          };
+
+          const { dimensions: newDimensions, position: newPosition } = handleResizeMove(
+            resizeState,
+            mousePosition,
+            element,
+            config
+          );
+
+          // Update element dimensions and position in real-time
+          onElementUpdate(element.id, {
+            dimensions: newDimensions,
+            position: newPosition,
+          });
+        }
+
+        // Handle rotation
+        if (isRotating) {
+          const clientX = 'touches' in e ? (e.touches[0]?.clientX ?? 0) : e.clientX;
+          const clientY = 'touches' in e ? (e.touches[0]?.clientY ?? 0) : e.clientY;
+
+          // Calculate center of element
+          const centerX = position.x + dimensions.width / 2;
+          const centerY = position.y + dimensions.height / 2;
+
+          // Calculate current angle
+          const currentMouseAngle = Math.atan2(clientY - centerY, clientX - centerX) * (180 / Math.PI);
+          
+          // Calculate rotation delta
+          const angleDelta = currentMouseAngle - rotationStart.mouseAngle;
+          let newRotation = rotationStart.angle + angleDelta;
+
+          // Normalize to 0-360
+          newRotation = ((newRotation % 360) + 360) % 360;
+
+          onElementUpdate(element.id, { rotation: newRotation });
+        }
       });
     };
 
     const handleMouseUp = () => {
-      if (!resizeState || !resizeState.isResizing) return;
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
 
-      // End resize operation
-      const finalResizeState = handleResizeEnd(resizeState);
-      setResizeState(finalResizeState);
+      if (resizeState && resizeState.isResizing) {
+        // End resize operation
+        const finalResizeState = handleResizeEnd(resizeState);
+        setResizeState(finalResizeState);
+      }
+
+      if (isRotating) {
+        setIsRotating(false);
+      }
     };
 
-    // Add global event listeners for mouse move and up
-    if (resizeState?.isResizing) {
+    // Add global event listeners for mouse/touch move and up
+    if (resizeState?.isResizing || isRotating) {
       window.addEventListener('mousemove', handleMouseMove);
       window.addEventListener('mouseup', handleMouseUp);
+      window.addEventListener('touchmove', handleMouseMove);
+      window.addEventListener('touchend', handleMouseUp);
     }
 
     // Cleanup
     return () => {
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+      }
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('touchmove', handleMouseMove);
+      window.removeEventListener('touchend', handleMouseUp);
     };
-  }, [resizeState, element, config, onElementUpdate]);
+  }, [resizeState, isRotating, element, config, onElementUpdate, position, dimensions, rotationStart]);
 
   return (
     <div
@@ -108,6 +188,8 @@ export function SelectionOverlay({ element, config, onElementUpdate }: Selection
         width: `${dimensions.width}px`,
         height: `${dimensions.height}px`,
         pointerEvents: 'none',
+        transform: `rotate(${rotation}deg)`,
+        transformOrigin: 'center center',
       }}
     >
       {/* Border highlight */}
@@ -122,8 +204,22 @@ export function SelectionOverlay({ element, config, onElementUpdate }: Selection
             pointerEvents: 'auto',
           }}
           onMouseDown={(e) => handleMouseDown(e, handle)}
+          onTouchStart={(e) => handleMouseDown(e, handle)}
         />
       ))}
+
+      {/* Rotation handle */}
+      <div
+        className="rotation-handle"
+        style={{
+          pointerEvents: 'auto',
+        }}
+        onMouseDown={handleRotationMouseDown}
+        onTouchStart={handleRotationMouseDown}
+        title="Rotate"
+      >
+        <div className="rotation-handle-icon">↻</div>
+      </div>
     </div>
   );
 }

@@ -12,7 +12,7 @@ import { Canvas } from './components/Canvas';
 import { Toolbar } from './components/Toolbar';
 import { PropertiesPanel } from './components/PropertiesPanel';
 import { useCanvasState } from './hooks/useCanvasState';
-import { createRectangle, createTextBlock, createImagePlaceholder } from './utils/elementFactory';
+import { createRectangle, createTextBlock, createImagePlaceholder, createCircle, createLine } from './utils/elementFactory';
 import { exportCanvasAsPNG } from './utils/exportCanvas';
 import type { CanvasConfig, ElementType } from './types/canvas';
 import './App.css';
@@ -60,6 +60,12 @@ function App() {
         break;
       case 'image':
         element = createImagePlaceholder(state.elements);
+        break;
+      case 'circle':
+        element = createCircle(state.elements);
+        break;
+      case 'line':
+        element = createLine(state.elements);
         break;
     }
     dispatch({ type: 'ADD_ELEMENT', element });
@@ -122,44 +128,68 @@ function App() {
   return (
     <div className="app-container">
       <div className="app-header">
-        <h1>Mini Design Canvas Editor</h1>
+        <h1>✨ Advanced Design Studio</h1>
+        <p className="app-subtitle">Create stunning designs with powerful tools</p>
       </div>
       
-      <Toolbar
-        onAddElement={handleAddElement}
-        onExport={handleExport}
-        canUndo={canUndo}
-        canRedo={canRedo}
-        onUndo={undo}
-        onRedo={redo}
-      />
+      <div className="app-main">
+        <aside className="app-sidebar">
+          <Toolbar
+            onAddElement={handleAddElement}
+            onExport={handleExport}
+            canUndo={canUndo}
+            canRedo={canRedo}
+            onUndo={undo}
+            onRedo={redo}
+          />
+        </aside>
 
-      <div className="app-workspace">
-        <Canvas
-          elements={state.elements}
-          selectedId={state.selectedId}
-          config={canvasConfig}
-          onElementSelect={handleElementSelect}
-          onElementUpdate={handleElementUpdate}
-          onBackgroundClick={handleBackgroundClick}
-          onElementDelete={handleElementDelete}
-          onElementDuplicate={handleElementDuplicate}
-        />
+        <div className="app-workspace">
+          <Canvas
+            elements={state.elements}
+            selectedId={state.selectedId}
+            config={canvasConfig}
+            onElementSelect={handleElementSelect}
+            onElementUpdate={handleElementUpdate}
+            onBackgroundClick={handleBackgroundClick}
+            onElementDelete={handleElementDelete}
+            onElementDuplicate={handleElementDuplicate}
+          />
+        </div>
 
-        <PropertiesPanel
-          element={selectedElement}
-          config={canvasConfig}
-          onUpdate={handleElementUpdate}
-        />
+        <aside className="app-properties">
+          <PropertiesPanel
+            element={selectedElement}
+            config={canvasConfig}
+            onUpdate={handleElementUpdate}
+          />
+        </aside>
       </div>
 
-      <div className="app-info">
-        <p>Elements: {state.elements.length} | Selected: {state.selectedId || 'None'}</p>
-        <p>Click elements to select • Drag to move • Use resize handles to resize</p>
+      <div className="app-footer">
+        <div className="app-stats">
+          <span className="stat-item">
+            <span className="stat-icon">📦</span>
+            <span className="stat-value">{state.elements.length}</span>
+            <span className="stat-label">Elements</span>
+          </span>
+          <span className="stat-divider">•</span>
+          <span className="stat-item">
+            <span className="stat-icon">🎯</span>
+            <span className="stat-value">{state.selectedId ? '1' : '0'}</span>
+            <span className="stat-label">Selected</span>
+          </span>
+          <span className="stat-divider">•</span>
+          <span className="stat-item">
+            <span className="stat-icon">⚡</span>
+            <span className="stat-label">Drag to move • Resize handles • Double-click text/image</span>
+          </span>
+        </div>
         {exportError && (
-          <p className="error-message">
-            Export Error: {exportError}
-          </p>
+          <div className="error-banner">
+            <span className="error-icon">⚠️</span>
+            <span>Export Error: {exportError}</span>
+          </div>
         )}
       </div>
     </div>

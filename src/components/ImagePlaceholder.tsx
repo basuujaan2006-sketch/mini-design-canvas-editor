@@ -14,7 +14,7 @@ export interface ImagePlaceholderProps {
   element: Element;
   isSelected: boolean;
   onSelect: () => void;
-  onMouseDown?: (e: React.MouseEvent) => void;
+  onMouseDown?: (e: React.MouseEvent | React.TouchEvent) => void;
   onImageUpload?: (elementId: string, imageUrl: string) => void;
 }
 
@@ -32,7 +32,7 @@ export function ImagePlaceholder({
     onSelect();
   };
 
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
     if (onMouseDown) {
       onMouseDown(e);
     }
@@ -59,6 +59,8 @@ export function ImagePlaceholder({
     }
   };
 
+  const rotation = element.rotation || 0;
+
   return (
     <>
       <div
@@ -73,9 +75,12 @@ export function ImagePlaceholder({
           cursor: element.imageUrl ? 'pointer' : 'pointer',
           boxSizing: 'border-box',
           overflow: 'hidden',
+          transform: `rotate(${rotation}deg)`,
+          transformOrigin: 'center center',
         }}
         onClick={handleClick}
         onMouseDown={handleMouseDown}
+        onTouchStart={handleMouseDown}
         onDoubleClick={handleDoubleClick}
         title={element.imageUrl ? 'Image' : 'Double-click to upload image'}
       >

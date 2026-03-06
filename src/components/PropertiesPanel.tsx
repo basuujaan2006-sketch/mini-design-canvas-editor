@@ -20,6 +20,7 @@ export function PropertiesPanel({ element, config, onUpdate }: PropertiesPanelPr
   const [y, setY] = useState('');
   const [width, setWidth] = useState('');
   const [height, setHeight] = useState('');
+  const [rotation, setRotation] = useState('0');
   const [errors, setErrors] = useState<PropertyErrors>({});
 
   useEffect(() => {
@@ -28,6 +29,7 @@ export function PropertiesPanel({ element, config, onUpdate }: PropertiesPanelPr
       setY(element.position.y.toString());
       setWidth(element.dimensions.width.toString());
       setHeight(element.dimensions.height.toString());
+      setRotation((element.rotation || 0).toFixed(0));
       setErrors({});
     }
   }, [element]);
@@ -155,6 +157,24 @@ export function PropertiesPanel({ element, config, onUpdate }: PropertiesPanelPr
           className={errors.height ? 'error' : ''}
         />
         {errors.height && <span className="error-message">{errors.height}</span>}
+      </div>
+
+      <div className="property-group">
+        <label htmlFor="prop-rotation">Rotation:</label>
+        <input
+          id="prop-rotation"
+          type="range"
+          min="0"
+          max="360"
+          value={rotation}
+          onChange={(e) => {
+            const value = e.target.value;
+            setRotation(value);
+            onUpdate(element.id, { rotation: parseFloat(value) });
+          }}
+          className="rotation-slider"
+        />
+        <span className="rotation-value">{rotation}°</span>
       </div>
     </div>
   );
