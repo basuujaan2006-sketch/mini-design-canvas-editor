@@ -62,6 +62,38 @@ export function Toolbar({
         </button>
         <button
           className="toolbar-button"
+          onClick={() => onAddElement('triangle')}
+          title="Add Triangle"
+        >
+          <span className="toolbar-icon">🔺</span>
+          <span className="toolbar-label">Triangle</span>
+        </button>
+        <button
+          className="toolbar-button"
+          onClick={() => onAddElement('star')}
+          title="Add Star"
+        >
+          <span className="toolbar-icon">⭐</span>
+          <span className="toolbar-label">Star</span>
+        </button>
+        <button
+          className="toolbar-button"
+          onClick={() => onAddElement('hexagon')}
+          title="Add Hexagon"
+        >
+          <span className="toolbar-icon">⬡</span>
+          <span className="toolbar-label">Hexagon</span>
+        </button>
+        <button
+          className="toolbar-button"
+          onClick={() => onAddElement('arrow')}
+          title="Add Arrow"
+        >
+          <span className="toolbar-icon">➡️</span>
+          <span className="toolbar-label">Arrow</span>
+        </button>
+        <button
+          className="toolbar-button"
           onClick={() => onAddElement('line')}
           title="Add Line (L)"
         >

@@ -12,7 +12,17 @@ import { Canvas } from './components/Canvas';
 import { Toolbar } from './components/Toolbar';
 import { PropertiesPanel } from './components/PropertiesPanel';
 import { useCanvasState } from './hooks/useCanvasState';
-import { createRectangle, createTextBlock, createImagePlaceholder, createCircle, createLine } from './utils/elementFactory';
+import { 
+  createRectangle, 
+  createTextBlock, 
+  createImagePlaceholder, 
+  createCircle, 
+  createLine,
+  createTriangle,
+  createStar,
+  createHexagon,
+  createArrow
+} from './utils/elementFactory';
 import { exportCanvasAsPNG } from './utils/exportCanvas';
 import type { CanvasConfig, ElementType } from './types/canvas';
 import './App.css';
@@ -26,8 +36,23 @@ const canvasConfig: CanvasConfig = {
 };
 
 function App() {
-  const [state, dispatch, { undo, redo, canUndo, canRedo }] = useCanvasState();
+  const [state, dispatch, { undo, redo, canUndo, canRedo, commitPendingState: _commitPendingState }] = useCanvasState();
   const [exportError, setExportError] = useState<string | null>(null);
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    // Load theme from localStorage or default to dark
+    const savedTheme = localStorage.getItem('canvapro-theme');
+    return (savedTheme === 'light' ? 'light' : 'dark') as 'dark' | 'light';
+  });
+
+  // Apply theme to document root
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('canvapro-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
 
   const handleElementSelect = (id: string | null) => {
     dispatch({ type: 'SELECT_ELEMENT', id });
@@ -66,6 +91,18 @@ function App() {
         break;
       case 'line':
         element = createLine(state.elements);
+        break;
+      case 'triangle':
+        element = createTriangle(state.elements);
+        break;
+      case 'star':
+        element = createStar(state.elements);
+        break;
+      case 'hexagon':
+        element = createHexagon(state.elements);
+        break;
+      case 'arrow':
+        element = createArrow(state.elements);
         break;
     }
     dispatch({ type: 'ADD_ELEMENT', element });
@@ -128,8 +165,17 @@ function App() {
   return (
     <div className="app-container">
       <div className="app-header">
-        <h1>✨ Advanced Design Studio</h1>
-        <p className="app-subtitle">Create stunning designs with powerful tools</p>
+        <div>
+          <h1>✨ CANVAPRO</h1>
+          <p className="app-subtitle">Cosmic Design Studio</p>
+        </div>
+        <button 
+          className="theme-toggle" 
+          onClick={toggleTheme}
+          title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+        >
+          {theme === 'dark' ? '☀️' : '🌙'}
+        </button>
       </div>
       
       <div className="app-main">

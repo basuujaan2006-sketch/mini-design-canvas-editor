@@ -28,6 +28,7 @@ export function Rectangle({ element, isSelected, onSelect, onMouseDown }: Rectan
   };
 
   const rotation = element.rotation || 0;
+  const opacity = element.opacity ?? 1;
 
   return (
     <div
@@ -44,6 +45,7 @@ export function Rectangle({ element, isSelected, onSelect, onMouseDown }: Rectan
         boxSizing: 'border-box',
         transform: `rotate(${rotation}deg)`,
         transformOrigin: 'center center',
+        opacity: opacity,
       }}
       onClick={handleClick}
       onMouseDown={handleMouseDown}

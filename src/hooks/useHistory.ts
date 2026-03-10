@@ -5,10 +5,12 @@
  * It maintains past, present, and future state stacks to enable time-travel debugging
  * and user-friendly undo/redo operations.
  * 
+ * With debouncing support to batch rapid changes into single history entries.
+ * 
  * Requirements: 13.3, 13.4, 13.5, 13.6
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 
 /**
  * History state interface for managing undo/redo stacks
@@ -28,11 +30,12 @@ export interface HistoryState<T> {
  */
 export interface UseHistoryReturn<T> {
   state: T;
-  pushState: (newState: T | ((currentState: T) => T)) => void;
+  pushState: (newState: T | ((currentState: T) => T), debounce?: boolean) => void;
   undo: () => void;
   redo: () => void;
   canUndo: boolean;
   canRedo: boolean;
+  commitPendingState: () => void;
 }
 
 /**
@@ -69,29 +72,96 @@ export function useHistory<T>(initialState: T): UseHistoryReturn<T> {
     future: [],
   });
 
+  // Debouncing state
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const pendingStateRef = useRef<T | null>(null);
+  const isDebouncing = useRef(false);
+
+  /**
+   * Commit any pending debounced state to history
+   */
+  const commitPendingState = useCallback(() => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+      debounceTimerRef.current = null;
+    }
+
+    // Reset debouncing flags
+    isDebouncing.current = false;
+    pendingStateRef.current = null;
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, []);
+
   /**
    * Push a new state to history
    * 
-   * Adds the current state to the past stack and sets the new state as present.
-   * Clears the future stack (branching behavior - new actions invalidate redo history).
-   * 
-   * Requirement 13.6: When a new action is performed after undo, clear the redo stack
-   * 
    * @param newState - The new state to push to history, or a function that receives the current state and returns the new state
+   * @param debounce - If true, debounces the history push (useful for continuous operations like sliders)
    */
-  const pushState = useCallback((newState: T | ((currentState: T) => T)) => {
-    setHistory((current) => {
-      const resolvedNewState = typeof newState === 'function' 
-        ? (newState as (currentState: T) => T)(current.present)
-        : newState;
-      
-      return {
-        past: [...current.past, current.present],
-        present: resolvedNewState,
-        future: [], // Clear future stack when new action is performed
-      };
-    });
-  }, []);
+  const pushState = useCallback((newState: T | ((currentState: T) => T), debounce: boolean = false) => {
+    if (debounce) {
+      // Clear existing timer
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+
+      setHistory((current) => {
+        const resolvedNewState = typeof newState === 'function' 
+          ? (newState as (currentState: T) => T)(current.present)
+          : newState;
+
+        // If this is the first debounced change, save the current state to past
+        if (!isDebouncing.current) {
+          isDebouncing.current = true;
+          pendingStateRef.current = resolvedNewState;
+          
+          return {
+            past: [...current.past, current.present], // Save current to past
+            present: resolvedNewState,
+            future: [], // Clear future on new action
+          };
+        }
+
+        // For subsequent debounced changes, just update present
+        pendingStateRef.current = resolvedNewState;
+        return {
+          ...current,
+          present: resolvedNewState,
+        };
+      });
+
+      // Set timer to mark debouncing as complete after 500ms of inactivity
+      debounceTimerRef.current = setTimeout(() => {
+        isDebouncing.current = false;
+        pendingStateRef.current = null;
+        debounceTimerRef.current = null;
+      }, 500);
+    } else {
+      // Immediate push (non-debounced)
+      // First commit any pending debounced state
+      commitPendingState();
+
+      setHistory((current) => {
+        const resolvedNewState = typeof newState === 'function' 
+          ? (newState as (currentState: T) => T)(current.present)
+          : newState;
+        
+        return {
+          past: [...current.past, current.present],
+          present: resolvedNewState,
+          future: [], // Clear future stack when new action is performed
+        };
+      });
+    }
+  }, [commitPendingState]);
 
   /**
    * Undo the last action
@@ -104,6 +174,9 @@ export function useHistory<T>(initialState: T): UseHistoryReturn<T> {
    * Does nothing if there are no past states to undo to.
    */
   const undo = useCallback(() => {
+    // Commit any pending debounced state first
+    commitPendingState();
+
     setHistory((current) => {
       if (current.past.length === 0) {
         return current; // Nothing to undo
@@ -118,7 +191,7 @@ export function useHistory<T>(initialState: T): UseHistoryReturn<T> {
         future: [current.present, ...current.future],
       };
     });
-  }, []);
+  }, [commitPendingState]);
 
   /**
    * Redo the last undone action
@@ -131,6 +204,9 @@ export function useHistory<T>(initialState: T): UseHistoryReturn<T> {
    * Does nothing if there are no future states to redo to.
    */
   const redo = useCallback(() => {
+    // Commit any pending debounced state first
+    commitPendingState();
+
     setHistory((current) => {
       if (current.future.length === 0) {
         return current; // Nothing to redo
@@ -145,7 +221,7 @@ export function useHistory<T>(initialState: T): UseHistoryReturn<T> {
         future: newFuture,
       };
     });
-  }, []);
+  }, [commitPendingState]);
 
   // Derived state: whether undo/redo operations are available
   const canUndo = history.past.length > 0;
@@ -158,5 +234,6 @@ export function useHistory<T>(initialState: T): UseHistoryReturn<T> {
     redo,
     canUndo,
     canRedo,
+    commitPendingState,
   };
 }

@@ -291,7 +291,7 @@ describe('Canvas Component', () => {
       />
     );
 
-    expect(screen.getByText('Image')).toBeTruthy();
+    expect(screen.getByText('Double-click to upload')).toBeTruthy();
   });
 
   it('positions elements correctly', () => {

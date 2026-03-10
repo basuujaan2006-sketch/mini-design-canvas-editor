@@ -6,7 +6,7 @@
  */
 
 // Element type enumeration - ENHANCED with new shapes
-export type ElementType = 'rectangle' | 'text' | 'image' | 'circle' | 'line';
+export type ElementType = 'rectangle' | 'text' | 'image' | 'circle' | 'line' | 'triangle' | 'star' | 'hexagon' | 'arrow';
 
 // Position interface for x, y coordinates
 export interface Position {
@@ -39,6 +39,8 @@ export interface Element {
   fontSize?: number;   // for text
   fontFamily?: string; // for text
   borderRadius?: number; // for rounded rectangles
+  textColor?: string;  // for text color
+  backgroundColor?: string; // for text background
 }
 
 // Canvas configuration interface

@@ -202,7 +202,7 @@ describe('Toolbar Component', () => {
       />
     );
 
-    const undoButton = screen.getByText(/Undo/i);
+    const undoButton = screen.getByTitle(/Undo/i);
     expect(undoButton).toBeDisabled();
   });
 
@@ -234,7 +234,7 @@ describe('Toolbar Component', () => {
       />
     );
 
-    const redoButton = screen.getByText(/Redo/i);
+    const redoButton = screen.getByTitle(/Redo/i);
     expect(redoButton).toBeDisabled();
   });
 
@@ -310,7 +310,7 @@ describe('Toolbar Component', () => {
     expect(toolbar).toBeTruthy();
 
     const sections = container.querySelectorAll('.toolbar-section');
-    expect(sections).toHaveLength(3); // Element creation, undo/redo, export
+    expect(sections).toHaveLength(4); // Shapes, Content, History, Export
 
     const dividers = container.querySelectorAll('.toolbar-divider');
     expect(dividers).toHaveLength(2); // Two dividers between three sections

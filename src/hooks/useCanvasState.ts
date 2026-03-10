@@ -108,10 +108,11 @@ export function useCanvasState(initialGridSize?: number) {
     undo,
     redo,
     canUndo,
-    canRedo
+    canRedo,
+    commitPendingState
   } = useHistory<CanvasState>(initialState);
 
-  const dispatch = useCallback((action: CanvasAction) => {
+  const dispatch = useCallback((action: CanvasAction, debounce: boolean = false) => {
 
     if (action.type === 'UNDO') {
       undo();
@@ -123,12 +124,26 @@ export function useCanvasState(initialGridSize?: number) {
       return;
     }
 
+    // Determine if this action should be debounced
+    // Debounce continuous operations like rotation, resize, and property updates
+    const shouldDebounce = debounce || (
+      action.type === 'UPDATE_ELEMENT' && 
+      action.updates && 
+      (
+        'rotation' in action.updates ||
+        'opacity' in action.updates ||
+        'textColor' in action.updates ||
+        'backgroundColor' in action.updates ||
+        'color' in action.updates
+      )
+    );
+
     pushState((currentState) => {
       const newState = canvasReducer(currentState, action);
       return newState;
-    });
+    }, shouldDebounce);
 
   }, [pushState, undo, redo]);
 
-  return [state, dispatch, { undo, redo, canUndo, canRedo }] as const;
+  return [state, dispatch, { undo, redo, canUndo, canRedo, commitPendingState }] as const;
 }

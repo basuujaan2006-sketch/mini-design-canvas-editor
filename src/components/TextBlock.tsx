@@ -22,6 +22,13 @@ export function TextBlock({ element, isSelected, onSelect, onMouseDown, onTextCh
   const [editText, setEditText] = useState(element.text || 'Text');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Sync editText with element.text when not editing
+  useEffect(() => {
+    if (!isEditing) {
+      setEditText(element.text || 'Text');
+    }
+  }, [element.text, isEditing]);
+
   useEffect(() => {
     if (isEditing && textareaRef.current) {
       textareaRef.current.focus();
@@ -36,6 +43,7 @@ export function TextBlock({ element, isSelected, onSelect, onMouseDown, onTextCh
 
   const handleDoubleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    setEditText(element.text || 'Text');
     setIsEditing(true);
   };
 
@@ -47,8 +55,11 @@ export function TextBlock({ element, isSelected, onSelect, onMouseDown, onTextCh
 
   const handleBlur = () => {
     setIsEditing(false);
-    if (onTextChange && editText !== element.text) {
-      onTextChange(element.id, editText);
+    // Always update, even if text is empty or same
+    if (onTextChange) {
+      // If text is empty, set it to a default value
+      const finalText = editText.trim() === '' ? 'Text' : editText;
+      onTextChange(element.id, finalText);
     }
   };
 
@@ -57,9 +68,14 @@ export function TextBlock({ element, isSelected, onSelect, onMouseDown, onTextCh
       setIsEditing(false);
       setEditText(element.text || 'Text');
     }
+    // Prevent event from bubbling up when editing
+    e.stopPropagation();
   };
 
   const rotation = element.rotation || 0;
+  const textColor = element.textColor || '#000000';
+  const backgroundColor = element.backgroundColor || '#ffffff';
+  const opacity = element.opacity ?? 1;
 
   return (
     <div
@@ -77,6 +93,8 @@ export function TextBlock({ element, isSelected, onSelect, onMouseDown, onTextCh
         overflow: 'hidden',
         transform: `rotate(${rotation}deg)`,
         transformOrigin: 'center center',
+        backgroundColor: backgroundColor,
+        opacity: opacity,
       }}
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
@@ -91,6 +109,8 @@ export function TextBlock({ element, isSelected, onSelect, onMouseDown, onTextCh
           onChange={(e) => setEditText(e.target.value)}
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
           style={{
             width: '100%',
             height: '100%',
@@ -100,7 +120,7 @@ export function TextBlock({ element, isSelected, onSelect, onMouseDown, onTextCh
             resize: 'none',
             fontSize: '16px',
             fontFamily: 'Arial, sans-serif',
-            color: 'var(--color-text-primary)',
+            color: textColor,
             padding: 0,
           }}
         />
@@ -113,7 +133,7 @@ export function TextBlock({ element, isSelected, onSelect, onMouseDown, onTextCh
           justifyContent: 'center',
           fontSize: '16px',
           fontFamily: 'Arial, sans-serif',
-          color: 'var(--color-text-primary)',
+          color: textColor,
           wordWrap: 'break-word',
           whiteSpace: 'pre-wrap',
         }}>

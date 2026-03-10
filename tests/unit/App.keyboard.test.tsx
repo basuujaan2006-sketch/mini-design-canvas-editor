@@ -16,7 +16,7 @@ describe('App - Keyboard Shortcuts', () => {
       
       // Verify that the component renders without errors
       // The keyboard event listener is set up in useEffect
-      expect(document.querySelector('h1')?.textContent).toBe('Mini Design Canvas Editor');
+      expect(document.querySelector('h1')?.textContent).toBe('✨ CANVAPRO');
       
       // Cleanup
       unmount();

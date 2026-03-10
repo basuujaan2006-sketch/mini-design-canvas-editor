@@ -36,7 +36,7 @@ describe('ImagePlaceholder', () => {
       <ImagePlaceholder element={mockElement} isSelected={false} onSelect={onSelect} />
     );
 
-    expect(screen.getByText('Image')).toBeDefined();
+    expect(screen.getByText('Double-click to upload')).toBeDefined();
   });
 
   it('calls onSelect when clicked', () => {

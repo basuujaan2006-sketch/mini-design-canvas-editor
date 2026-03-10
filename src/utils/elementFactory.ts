@@ -76,6 +76,7 @@ export function createRectangle(
     dimensions: { ...DEFAULT_DIMENSIONS },
     zIndex: highestZIndex + 1,
     color: DEFAULT_RECTANGLE_COLOR,
+    opacity: 1,
   };
 }
 
@@ -106,6 +107,9 @@ export function createTextBlock(
     dimensions: { ...DEFAULT_DIMENSIONS },
     zIndex: highestZIndex + 1,
     text: DEFAULT_TEXT,
+    textColor: '#000000',
+    backgroundColor: '#ffffff',
+    opacity: 1,
   };
 }
 
@@ -179,6 +183,95 @@ export function createLine(
     dimensions: { width: 200, height: 3 },
     zIndex: highestZIndex + 1,
     color: '#14b8a6', // Teal
+    strokeWidth: 3,
+    opacity: 1,
+  };
+}
+
+/**
+ * Creates a new triangle element with default properties.
+ * 
+ * @param existingElements - Array of existing elements (used to determine z-index)
+ * @returns A new triangle element
+ */
+export function createTriangle(
+  existingElements: Element[]
+): Element {
+  const highestZIndex = getHighestZIndex(existingElements);
+  
+  return {
+    id: crypto.randomUUID(),
+    type: 'triangle' as ElementType,
+    position: { ...DEFAULT_POSITION },
+    dimensions: { width: 120, height: 120 },
+    zIndex: highestZIndex + 1,
+    color: '#10b981', // Green
+    opacity: 1,
+  };
+}
+
+/**
+ * Creates a new star element with default properties.
+ * 
+ * @param existingElements - Array of existing elements (used to determine z-index)
+ * @returns A new star element
+ */
+export function createStar(
+  existingElements: Element[]
+): Element {
+  const highestZIndex = getHighestZIndex(existingElements);
+  
+  return {
+    id: crypto.randomUUID(),
+    type: 'star' as ElementType,
+    position: { ...DEFAULT_POSITION },
+    dimensions: { width: 120, height: 120 },
+    zIndex: highestZIndex + 1,
+    color: '#f59e0b', // Amber
+    opacity: 1,
+  };
+}
+
+/**
+ * Creates a new hexagon element with default properties.
+ * 
+ * @param existingElements - Array of existing elements (used to determine z-index)
+ * @returns A new hexagon element
+ */
+export function createHexagon(
+  existingElements: Element[]
+): Element {
+  const highestZIndex = getHighestZIndex(existingElements);
+  
+  return {
+    id: crypto.randomUUID(),
+    type: 'hexagon' as ElementType,
+    position: { ...DEFAULT_POSITION },
+    dimensions: { width: 120, height: 120 },
+    zIndex: highestZIndex + 1,
+    color: '#8b5cf6', // Purple
+    opacity: 1,
+  };
+}
+
+/**
+ * Creates a new arrow element with default properties.
+ * 
+ * @param existingElements - Array of existing elements (used to determine z-index)
+ * @returns A new arrow element
+ */
+export function createArrow(
+  existingElements: Element[]
+): Element {
+  const highestZIndex = getHighestZIndex(existingElements);
+  
+  return {
+    id: crypto.randomUUID(),
+    type: 'arrow' as ElementType,
+    position: { ...DEFAULT_POSITION },
+    dimensions: { width: 150, height: 60 },
+    zIndex: highestZIndex + 1,
+    color: '#ef4444', // Red
     strokeWidth: 3,
     opacity: 1,
   };

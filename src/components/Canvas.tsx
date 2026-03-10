@@ -21,6 +21,10 @@ import { TextBlock } from './TextBlock';
 import { ImagePlaceholder } from './ImagePlaceholder';
 import { Circle } from './Circle';
 import { Line } from './Line';
+import { Triangle } from './Triangle';
+import { Star } from './Star';
+import { Hexagon } from './Hexagon';
+import { Arrow } from './Arrow';
 import { SelectionOverlay } from './SelectionOverlay';
 import { AlignmentGuides } from './AlignmentGuides';
 import { handleDragStart, handleDragMove } from '../utils/dragHandler';
@@ -356,6 +360,46 @@ function CanvasElement({ element, isSelected, onSelect, onMouseDown, onImageUplo
     case 'line':
       return (
         <Line
+          element={element}
+          isSelected={isSelected}
+          onSelect={onSelect}
+          onMouseDown={onMouseDown}
+        />
+      );
+
+    case 'triangle':
+      return (
+        <Triangle
+          element={element}
+          isSelected={isSelected}
+          onSelect={onSelect}
+          onMouseDown={onMouseDown}
+        />
+      );
+
+    case 'star':
+      return (
+        <Star
+          element={element}
+          isSelected={isSelected}
+          onSelect={onSelect}
+          onMouseDown={onMouseDown}
+        />
+      );
+
+    case 'hexagon':
+      return (
+        <Hexagon
+          element={element}
+          isSelected={isSelected}
+          onSelect={onSelect}
+          onMouseDown={onMouseDown}
+        />
+      );
+
+    case 'arrow':
+      return (
+        <Arrow
           element={element}
           isSelected={isSelected}
           onSelect={onSelect}
