@@ -1,0 +1,62 @@
+/**
+ * AlignmentGuides Styles
+ * 
+ * Stunning neon-style alignment guides with glow effects.
+ * 
+ * Requirements: 12.2, 12.3, 9.5
+ */
+
+.alignment-guide {
+  position: absolute;
+  pointer-events: none;
+  z-index: 9999;
+  background: linear-gradient(90deg, var(--color-secondary), var(--color-accent));
+  opacity: 0.9;
+  animation: guideAppear 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes guideAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+}
+
+.alignment-guide-vertical {
+  width: 2px;
+  box-shadow: 
+    0 0 10px rgba(236, 72, 153, 0.8),
+    0 0 20px rgba(236, 72, 153, 0.6),
+    0 0 30px rgba(236, 72, 153, 0.4);
+  animation: guideAppear 0.2s cubic-bezier(0.4, 0, 0.2, 1), guidePulse 1.5s ease-in-out infinite;
+}
+
+.alignment-guide-horizontal {
+  height: 2px;
+  box-shadow: 
+    0 0 10px rgba(236, 72, 153, 0.8),
+    0 0 20px rgba(236, 72, 153, 0.6),
+    0 0 30px rgba(236, 72, 153, 0.4);
+  animation: guideAppear 0.2s cubic-bezier(0.4, 0, 0.2, 1), guidePulse 1.5s ease-in-out infinite;
+}
+
+@keyframes guidePulse {
+  0%, 100% {
+    opacity: 0.9;
+    box-shadow: 
+      0 0 10px rgba(236, 72, 153, 0.8),
+      0 0 20px rgba(236, 72, 153, 0.6),
+      0 0 30px rgba(236, 72, 153, 0.4);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 
+      0 0 15px rgba(236, 72, 153, 1),
+      0 0 30px rgba(236, 72, 153, 0.8),
+      0 0 45px rgba(236, 72, 153, 0.6);
+  }
+}

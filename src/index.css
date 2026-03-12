@@ -1,0 +1,6 @@
+/**
+ * Main entry point for styles
+ * Imports global styles for the Mini Design Canvas Editor
+ */
+
+@import './styles/global.css';

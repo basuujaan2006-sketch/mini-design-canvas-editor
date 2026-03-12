@@ -1,0 +1,185 @@
+/**
+ * Cosmic UI - Selection Overlay
+ * Holographic selection controls with soft neon glow
+ */
+
+.selection-overlay {
+  z-index: 1000;
+  will-change: transform;
+}
+
+/* Glowing holographic border */
+.selection-border {
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  border: 2px solid var(--color-primary);
+  pointer-events: none;
+  box-sizing: border-box;
+  border-radius: var(--radius-md);
+  box-shadow: 
+    0 0 20px var(--color-primary-glow),
+    inset 0 0 20px var(--color-primary-glow);
+  animation: selectionPulse 2s ease-in-out infinite;
+}
+
+@keyframes selectionPulse {
+  0%, 100% { 
+    opacity: 1;
+    box-shadow: 
+      0 0 20px var(--color-primary-glow),
+      inset 0 0 20px var(--color-primary-glow);
+  }
+  50% { 
+    opacity: 0.7;
+    box-shadow: 
+      0 0 30px var(--color-primary-glow),
+      inset 0 0 30px var(--color-primary-glow);
+  }
+}
+
+/* Holographic resize handles */
+.resize-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: var(--color-primary);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-sizing: border-box;
+  border-radius: 3px;
+  transition: transform 0.1s ease;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.5),
+    var(--shadow-glow-purple);
+}
+
+/* Corner handles */
+.resize-handle-nw {
+  top: -6px;
+  left: -6px;
+  cursor: nw-resize;
+}
+
+.resize-handle-ne {
+  top: -6px;
+  right: -6px;
+  cursor: ne-resize;
+}
+
+.resize-handle-se {
+  bottom: -6px;
+  right: -6px;
+  cursor: se-resize;
+}
+
+.resize-handle-sw {
+  bottom: -6px;
+  left: -6px;
+  cursor: sw-resize;
+}
+
+/* Edge handles */
+.resize-handle-n {
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: n-resize;
+}
+
+.resize-handle-e {
+  top: 50%;
+  right: -6px;
+  transform: translateY(-50%);
+  cursor: e-resize;
+}
+
+.resize-handle-s {
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: s-resize;
+}
+
+.resize-handle-w {
+  top: 50%;
+  left: -6px;
+  transform: translateY(-50%);
+  cursor: w-resize;
+}
+
+/* Neon glow on hover */
+.resize-handle:hover {
+  background: var(--color-secondary);
+  transform: scale(1.4);
+  box-shadow: 
+    0 2px 12px rgba(0, 0, 0, 0.6),
+    var(--shadow-glow-cyan);
+}
+
+/* Maintain transform for edge handles on hover */
+.resize-handle-n:hover,
+.resize-handle-s:hover {
+  transform: translateX(-50%) scale(1.4);
+}
+
+.resize-handle-e:hover,
+.resize-handle-w:hover {
+  transform: translateY(-50%) scale(1.4);
+}
+
+/* Holographic rotation handle */
+.rotation-handle {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 28px;
+  background: var(--color-accent);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s ease;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.5),
+    var(--shadow-glow-pink);
+}
+
+.rotation-handle::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 12px;
+  background: linear-gradient(180deg, var(--color-accent), transparent);
+  box-shadow: 0 0 8px var(--color-accent-glow);
+}
+
+.rotation-handle-icon {
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  user-select: none;
+  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.8));
+}
+
+.rotation-handle:hover {
+  transform: translateX(-50%) scale(1.3);
+  background: var(--color-accent-hover);
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.6),
+    0 0 30px var(--color-accent-glow);
+  cursor: grabbing;
+}
+
+.rotation-handle:active {
+  transform: translateX(-50%) scale(1.2);
+  cursor: grabbing;
+}
